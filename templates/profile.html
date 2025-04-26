@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+  <title>User Profile | F1 AI Platform</title>
+</head>
+<body>
+  <div class="profile-container">
+    <h1>User Profile</h1>
+    <div class="profile-card">
+      <div class="profile-picture" id="profile-picture-container">
+        <img id="profile-img" src="{% if user.profile_picture %}{{ url_for('static', filename='uploads/' + user.profile_picture) }}{% else %}{{ url_for('static', filename='default_profile.png') }}{% endif %}" alt="Profile Picture" />
+        <div class="upload-overlay" id="upload-overlay" title="Click to change profile picture">&#128247;</div>
+        <input type="file" id="upload-photo" accept="image/*" style="display:none;" />
+      </div>
+      <div class="profile-details">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <!-- Add more user details here if needed -->
+        <button id="save-btn" disabled>Save</button>
+        <button id="reset-btn">Reset</button>
+      </div>
+    </div>
+    <a href="{{ url_for('home') }}" class="back-link">&larr; Back to Home</a>
+  </div>
+  <script>
+    const uploadInput = document.getElementById('upload-photo');
+    const profileImg = document.getElementById('profile-img');
+    const uploadOverlay = document.getElementById('upload-overlay');
+    const saveBtn = document.getElementById('save-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    let originalSrc = profileImg.src;
+    let newFile = null;
+
+    uploadOverlay.addEventListener('click', () => {
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          profileImg.src = e.target.result;
+          saveBtn.disabled = false;
+          newFile = file;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    saveBtn.addEventListener('click', () => {
+      if (!newFile) return;
+      const formData = new FormData();
+      formData.append('profile_picture', newFile);
+
+      fetch('/upload_profile_picture', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          originalSrc = profileImg.src;
+          saveBtn.disabled = true;
+          alert('Profile picture updated successfully!');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(() => {
+        alert('Upload failed. Please try again.');
+      });
+    });
+
+    resetBtn.addEventListener('click', () => {
+      profileImg.src = originalSrc;
+      uploadInput.value = '';
+      saveBtn.disabled = true;
+      newFile = null;
+    });
+  </script>
+</body>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>F1 AI Platform</title>
+
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='footer.css') }}">
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script> 
+</head>
+<body>
+<main>
+  <script src ="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+  <script src ="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+  <script>
+    window.addEventListener('load', function() {
+      VANTA.FOG({
+          el: "#background",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          highlightColor: 0xf70000,
+          midtoneColor: 0xd60000,
+          lowlightColor: 0xe3ff00,
+          baseColor: 0x10100,
+          blurFactor: 0.72,
+          speed: 2.10,
+          zoom: 1.20
+        });
+    });
+  </script>
+
+  <div id="background"></div>
+  <!-- TEMPORARY MARKER: Latest index.html loaded -->
+  <div id="loading-screen">
+    <div class="car-track">
+      <div class="f1-car"></div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('load', function() {
+      document.getElementById('loading-screen').style.display = 'none';
+    });
+  </script>
+
+  <h1>Welcome, {{ username }} 👋</h1>
+  <p>Explore the world of Formula 1 with our AI-powered platform!</p>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <ul>
+      <li><a href="#drivers">Drivers</a></li>
+      <li><a href="#quiz">Quiz</a></li>
+      <li><a href="#voice-assistant">Voice Assistant</a></li>
+      <li><a href="#race-prediction">Race Prediction</a></li>
+      <li><a href="#f1-facts">F1 Facts</a></li>
+      <li><a href="#driver-suggestion">Driver Suggestion</a></li>
+      <li><a href="#comparison">Comparison</a></li>
+      <li><a href="#race-results">Live Race Results</a></li>
+      <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Drivers Section -->
+  <section id="drivers">
+    <h2>Add Driver</h2>
+    <form id="driver-form">
+      <input type="text" id="driverID" placeholder="Driver ID" required />
+      <input type="text" id="driverName" placeholder="Driver Name" required />
+      <input type="text" id="carNumber" placeholder="Car Number" required />
+      <input type="text" id="races" placeholder="No. of Races" required />
+      <input type="text" id="teamID" placeholder="Team ID" required />
+      <button type="button" id="add-driver-btn" onclick="addDriver()">Add Driver</button>
+    </form>
+    <h3>Drivers List</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Car No</th>
+          <th>Races</th>
+          <th>Team ID</th>
+        </tr>
+      </thead>
+      <tbody id="drivers-list"></tbody>
+    </table>
+  </section>
+
+  <!-- Quiz Section -->
+  <section id="quiz">
+    <h2>Quiz Time 🏁</h2>
+    <p id="quiz-question">Loading question...</p>
+    <div id="quiz-options"></div>
+    <p id="quiz-feedback"></p>
+    <p>Score: <span id="quiz-score">0</span></p>
+    <button id="next-question">Next Question</button>
+    <button onclick="generateQuiz()">New Question</button>
+    <button onclick="resetQuiz()">Reset Quiz</button>
+  </section>
+
+  <!-- Comparison Section -->
+  <section id="comparison">
+    <h2>Compare Drivers</h2>
+    <select id="compare-entity1" aria-label="Select first driver to compare"></select>
+    <select id="compare-entity2" aria-label="Select second driver to compare"></select>
+    <button id="compare-btn">Compare</button>
+    <p id="comparison-result">Coming soon!</p>
+  </section>
+
+  <!-- Race Results Section -->
+  <section id="race-results">
+    <h2>Live Race Results</h2>
+    <p id="race-results-text">Coming soon!</p>
+  </section>
+
+  <!-- Add below inside <main> before <footer> -->
+    <section id="voice-assistant">
+  <h2>🎙️ Voice Assistant</h2>
+  <div id="mic-container">
+    <button id="start-voice-btn" onclick="startVoiceRecognition()">🎤 Start Speaking</button>
+    <div id="mic-animation"></div>  <!-- This is the glowing mic circle -->
+  </div>
+  <p id="voice-output">Say things like "Add driver", "Start quiz", "Compare Max and Lewis".</p>
+</section>
+
+    
+<section id="race-prediction">
+  <h2>🏎️ Predict Race Winner</h2>
+  <select id="predict-driver1" aria-label="Select driver 1"></select>
+  <select id="predict-driver2" aria-label="Select driver 2"></select>
+  <select id="predict-driver3" aria-label="Select driver 3"></select>
+  <button onclick="predictWinner()">Predict Winner</button>
+  <p id="prediction-result">Awaiting prediction...</p>
+</section>
+
+<section id="f1-facts">
+  <h2>📚 F1 AI Facts</h2>
+  <button onclick="generateFact()">Get Random Fact</button>
+  <p id="fact-text">F1 is full of surprises! 🏁</p>
+</section>
+
+<section id="driver-suggestion">
+  <h2>🔍 Personalized Driver Suggestion</h2>
+  <input type="number" id="races-input" placeholder="Enter number of races"/>
+  <button onclick="suggestDriver()">Suggest Driver</button>
+  <p id="suggestion-text">Let's find your match!</p>
+</section>
+
+
+  <!-- Botpress Assistant -->
+  <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2025/04/05/18/20250405180531-JDT03E6L.js"></script>
+
+</main>
+
+<footer class="main-footer">
+  <div class="footer-container">
+    <div class="footer-column">
+      <h4>About This Platform</h4>
+      <p>This F1 AI Platform gives real-time updates, AI-generated quizzes, driver comparisons, and more.</p>
+    </div>
+    <div class="footer-column">
+      <h4>Official Links</h4>
+      <ul>
+        <li><a href="https://www.formula1.com" target="_blank">Official F1 Website</a></li>
+        <li><a href="https://www.fia.com" target="_blank">FIA</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>Contact Us</h4>
+      <p>Email: javintrivedi007@gmail.com</p>
+      <p>Phone: +91 8209597013</p>
+      <p>Chennai, India</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2025 F1 AI Platform. All Rights Reserved.
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | F1 Guide</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+</head>
+<body>
+  <div id="background"></div>
+  <div class="auth-container">
+      <div class="auth-form">
+          <h2>Login to F1 Guide</h2>
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <form method="POST" action="{{ url_for('login') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required>
+
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required>
+
+              <button type="submit">Login</button>
+          </form>
+
+          <p class="form-footer">Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a></p>
+      </div>
+  </div>
+
+  <script src ="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+  <script src ="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+  <script>
+    window.addEventListener('load', function() {
+      VANTA.FOG({
+          el: "#background",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          highlightColor: 0xf70000,
+          midtoneColor: 0xd60000,
+          lowlightColor: 0xe3ff00,
+          baseColor: 0x10100,
+          blurFactor: 0.72,
+          speed: 2.10,
+          zoom: 1.20
+        });
+    });
+  </script>
+</body>
+</html>

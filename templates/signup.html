@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | F1 Hub</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+</head>
+<body>
+  <div id="background"></div>
+  <div class="auth-container">
+      <div class="auth-form">
+          <h2>Create Your F1 Hub Account</h2>
+
+          <!-- Display flash messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  <ul>
+                      {% for category, message in messages %}
+                          <li class="flash {{ category }}">{{ message }}</li>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          {% endwith %}
+
+          <form method="POST" action="/signup">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <!-- Form fields with values from the request -->
+              <label for="username">Username:</label>
+              <input type="text" id="username" name="username" value="{{ request.form.get('username') }}" required>
+
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" value="{{ request.form.get('email') }}" required>
+
+              <label for="password">Password:</label>
+              <input type="password" id="password" name="password" required>
+
+              <button type="submit">Sign Up</button>
+          </form>
+
+          <p class="form-footer">
+              Already have an account? <a href="/login">Login here</a>
+          </p>
+      </div>
+  </div>
+
+  <script src ="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+  <script src ="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+  <script>
+    window.addEventListener('load', function() {
+      VANTA.FOG({
+          el: "#background",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          highlightColor: 0xf70000,
+          midtoneColor: 0xd60000,
+          lowlightColor: 0xe3ff00,
+          baseColor: 0x10100,
+          blurFactor: 0.72,
+          speed: 2.10,
+          zoom: 1.20
+        });
+    });
+  </script>
+</body>
+</html>
