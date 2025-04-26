@@ -22,6 +22,7 @@ Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.2
 fonttools==4.49.0
 greenlet==3.2.0
+gunicorn
 idna==3.10
 ipykernel==6.29.5
 ipython==8.26.0
