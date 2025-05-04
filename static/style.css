@@ -41,6 +41,51 @@ body {
     padding-bottom: 60px;
 }
 
+/* Style driver dropdowns like input boxes */
+#driver1-select,
+#driver2-select {
+  background-color: #374151;
+  color: white;
+  padding: 0.75rem 1rem;
+  border: 2px solid #dc2626;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-family: 'Orbitron', sans-serif;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+#driver1-select:focus,
+#driver2-select:focus {
+  border-color: #f87171;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  background-color: #1f2937;
+}
+
+/* Align driver dropdowns and related inputs in Add Team form in a single row */
+#add-team-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#add-team-form label {
+  white-space: nowrap;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+#add-team-form select,
+#add-team-form input {
+  flex: 1 1 100px;
+  min-width: 100px;
+  max-width: 100%;
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -124,7 +169,8 @@ section,
     background-color: #1a1e2d;
     padding: 1rem 0;
     text-align: center;
-    position: sticky;
+    position: fixed;
+    width: 100%;
     top: 0;
     z-index: 999;
   }
@@ -151,6 +197,30 @@ section,
   .navbar a:hover {
     color: #ff4757;
   }
+
+  .navbar a.active {
+    color: #dc2626;
+    border-bottom: 2px solid #dc2626;
+    font-weight: 700;
+  }
+  
+  /* Add top padding to main content to avoid being hidden behind fixed navbar */
+#welcome-message {
+    padding: 2rem 3rem;
+    width: 90vw;
+    max-width: 900px;
+    height: auto;
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem auto;
+    box-sizing: border-box;
+    border-radius: 15px;
+    box-shadow: 0 0 20px #dc2626;
+    background: radial-gradient(circle at center, #dc2626, #1a1e2d);
+}
   
 
 section {
@@ -413,7 +483,7 @@ tbody tr:nth-child(even) {
     justify-content: center;
     align-items: center;
     min-height: 80vh;
-    padding: 2rem;
+    padding: 4rem 2rem 2rem 2rem;
 }
 
 .auth-form {
@@ -532,29 +602,72 @@ tbody tr:nth-child(even) {
     color: black;
 }
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    .auth-container {
-        padding: 1rem;
-        min-height: 70vh;
-    }
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+      .auth-container {
+          padding: 1rem;
+          min-height: 70vh;
+      }
+  
+      .auth-form {
+          padding: 1.5rem 2rem;
+          border-radius: 0.75rem;
+          gap: 1rem;
+      }
+  
+      .auth-form h2 {
+          font-size: 1.5rem;
+      }
+  
+      .auth-form input,
+      .auth-form button {
+          font-size: 1rem;
+          padding: 0.6rem 0.8rem;
+      }
+  }
 
-    .auth-form {
-        padding: 1.5rem 2rem;
-        border-radius: 0.75rem;
-        gap: 1rem;
-    }
+  /* Added welcome page styles */
+  .welcome-quote {
+    font-style: italic;
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    color: #f87171;
+    text-shadow: 0 0 5px rgba(255, 71, 87, 0.7);
+  }
 
-    .auth-form h2 {
-        font-size: 1.5rem;
-    }
+  #welcome-message {
+    animation: fadeInWelcome 2s ease forwards;
+    background: radial-gradient(circle at center, #dc2626, #1a1e2d);
+    border-radius: 15px;
+    box-shadow: 0 0 30px #dc2626;
+    padding: 3rem 2rem;
+  }
 
-    .auth-form input,
-    .auth-form button {
-        font-size: 1rem;
-        padding: 0.6rem 0.8rem;
+  @keyframes fadeInWelcome {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
     }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+#welcome-message h1 {
+    font-size: 3rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 15px #ff4c4c;
 }
+
+  #welcome-message p {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0.5rem auto;
+  }
 
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);

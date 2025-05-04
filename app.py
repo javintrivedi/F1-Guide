@@ -169,6 +169,84 @@ def get_drivers():
     finally:
         cursor.close()
         conn.close()
+        
+@app.route('/get_teams', methods=['GET'])
+def get_teams():
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT Driver1, Driver2, CarNo1, CarNo2, no_of_race_championship, team_id, teamName
+            FROM teams
+            ORDER BY team_id
+        """)
+        teams = cursor.fetchall()
+        return jsonify({"success": True, "data": teams})
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Retrieval error: {e}")
+        return jsonify({"success": False, "error": "Database error"}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+import random
+
+@app.route('/add_team', methods=['POST'])
+def add_team():
+    data = request.json
+    required_fields = ["Driver1", "Driver2", "no_of_race_championship", "teamName"]
+
+    if not all(field in data and data[field] for field in required_fields):
+        return jsonify({"success": False, "error": "All fields are required"}), 400
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        # Generate unique 3-digit numeric team_id as string
+        existing_ids = set()
+        cursor.execute("SELECT team_id FROM teams")
+        rows = cursor.fetchall()
+        for row in rows:
+            existing_ids.add(row[0])
+
+        def generate_team_id():
+            return f"{random.randint(0, 999):03d}"
+
+        team_id = generate_team_id()
+        while team_id in existing_ids:
+            team_id = generate_team_id()
+
+        # Get car numbers for Driver1 and Driver2
+        cursor.execute("SELECT carNo FROM drivers WHERE driver_name = %s", (data["Driver1"],))
+        carno1_row = cursor.fetchone()
+        carno1 = carno1_row[0] if carno1_row else None
+
+        cursor.execute("SELECT carNo FROM drivers WHERE driver_name = %s", (data["Driver2"],))
+        carno2_row = cursor.fetchone()
+        carno2 = carno2_row[0] if carno2_row else None
+
+        if carno1 is None or carno2 is None:
+            return jsonify({"success": False, "error": "One or both drivers not found"}), 404
+
+        # Insert new team with generated team_id and derived car numbers
+        cursor.execute("""
+            INSERT INTO teams (Driver1, Driver2, CarNo1, CarNo2, no_of_race_championship, teamName, team_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (data["Driver1"], data["Driver2"], carno1, carno2, data["no_of_race_championship"], data["teamName"], team_id))
+        conn.commit()
+        return jsonify({"success": True, "message": "Team added successfully", "team_id": team_id})
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Insert team error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route('/generate_quiz', methods=['GET'])
 def generate_quiz():

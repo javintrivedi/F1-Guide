@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
     mainContent.style.display = "block";
   }
 
+  // Add event listener for Generate New Fact button
+  const generateFactBtn = document.getElementById("generate-fact-btn");
+  if (generateFactBtn) {
+    generateFactBtn.addEventListener("click", () => {
+      generateFact();
+    });
+  }
+
   // Navigation Links
   navLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
@@ -21,10 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         const targetId = href.substring(1);
         if (targetId) {
+          // Remove active class from all nav links
+          navLinks.forEach(nav => nav.classList.remove("active"));
+          // Add active class to clicked link
+          link.classList.add("active");
+
           // Hide all sections
           mainSections.forEach(section => {
             section.style.display = "none";
           });
+          // Hide welcome message
+          const welcomeMessage = document.getElementById("welcome-message");
+          if (welcomeMessage) {
+            welcomeMessage.style.display = "none";
+          }
           // Show the clicked section
           const targetSection = document.getElementById(targetId);
           if (targetSection) {
@@ -47,7 +65,117 @@ document.addEventListener("DOMContentLoaded", () => {
       loadQuizQuestion(); // Fetch quiz question when "quiz" section is shown
     } else if (id === "comparison") {
       fetchEntities(); // Fetch entities for comparison when "comparison" section is shown
+    } else if (id === "teams") {
+      fetchTeams(); // Fetch teams data when "teams" section is shown
+      populateTeamDriverDropdowns(); // Populate driver dropdowns in add team form
     }
+  }
+
+  // Populate driver dropdowns in Add Team form
+  function populateTeamDriverDropdowns() {
+    fetch('/get_drivers')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const driver1Select = document.getElementById('driver1-select');
+          const driver2Select = document.getElementById('driver2-select');
+          driver1Select.innerHTML = '<option value="" disabled selected>Select Driver 1</option>';
+          driver2Select.innerHTML = '<option value="" disabled selected>Select Driver 2</option>';
+
+          data.data.forEach(driver => {
+            const option1 = document.createElement('option');
+            option1.value = driver.driver_name;
+            option1.textContent = driver.driver_name;
+            option1.dataset.carNo = driver.carNo;
+            driver1Select.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = driver.driver_name;
+            option2.textContent = driver.driver_name;
+            option2.dataset.carNo = driver.carNo;
+            driver2Select.appendChild(option2);
+          });
+
+          // Add event listeners to update car numbers when drivers are selected
+          driver1Select.addEventListener('change', () => {
+            const selectedOption = driver1Select.options[driver1Select.selectedIndex];
+            document.getElementById('carno1-input').value = selectedOption.dataset.carNo || '';
+          });
+
+          driver2Select.addEventListener('change', () => {
+            const selectedOption = driver2Select.options[driver2Select.selectedIndex];
+            document.getElementById('carno2-input').value = selectedOption.dataset.carNo || '';
+          });
+        } else {
+          alert('Failed to load drivers for team form.');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading drivers for team form:', error);
+      });
+  }
+
+  // Handle Add Team form submission
+  const addTeamForm = document.getElementById('add-team-form');
+  if (addTeamForm) {
+    addTeamForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const Driver1 = document.getElementById('driver1-select').value;
+      const Driver2 = document.getElementById('driver2-select').value;
+      const no_of_race_championship = document.getElementById('championships-input').value;
+      const teamName = document.getElementById('teamname-input').value.trim();
+
+      if (!Driver1 || !Driver2 || !no_of_race_championship || !teamName) {
+        alert('⚠ Please fill in all fields.');
+        return;
+      }
+
+      // Get CSRF token from meta tag
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+      try {
+        const res = await fetch('/add_team', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+            Driver1,
+            Driver2,
+            no_of_race_championship,
+            teamName
+          })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          alert('✅ Team added successfully!');
+          addTeamForm.reset();
+          fetchTeams(); // Refresh teams table
+
+          // Add the new team row to the table immediately
+          const teamsList = document.getElementById('teams-list');
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td>${Driver1}</td>
+            <td>${Driver2}</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>${no_of_race_championship}</td>
+            <td>${result.team_id}</td>
+            <td>${teamName}</td>
+          `;
+          teamsList.appendChild(newRow);
+
+        } else {
+          alert(`❌ Error: ${result.error}`);
+        }
+      } catch (err) {
+        alert(`❌ Network error: ${err.message}`);
+      }
+    });
   }
 
   // Driver Management
@@ -117,6 +245,33 @@ document.addEventListener("DOMContentLoaded", () => {
       alert(`❌ Error: ${err.message}`);
     }
   }
+
+  function fetchTeams() {
+    fetch('/get_teams')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const teamsList = document.getElementById('teams-list');
+                teamsList.innerHTML = ''; // Clear existing rows
+                data.data.forEach(team => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${team.Driver1 || 'N/A'}</td>
+                        <td>${team.Driver2 || 'N/A'}</td>
+                        <td>${team.CarNo1 || 'N/A'}</td>
+                        <td>${team.CarNo2 || 'N/A'}</td>
+                        <td>${team.no_of_race_championship || 'N/A'}</td>
+                        <td>${team.team_id || 'N/A'}</td>
+                        <td>${team.teamName || 'N/A'}</td>
+                    `;
+                    teamsList.appendChild(row);
+                });
+            } else {
+                alert(data.error || 'Failed to fetch teams.');
+            }
+        })
+        .catch(error => console.error('Error fetching teams:', error));
+}
 
   // Comparison
   function fetchEntities() {

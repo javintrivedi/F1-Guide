@@ -40,7 +40,7 @@ body::before {
 
 .profile-container {
   max-width: 600px;
-  margin: 40px auto;
+  margin: 60px auto 40px auto;
   padding: 30px 25px;
   background-color: #000000;
   opacity: 95%;

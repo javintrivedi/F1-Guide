@@ -48,26 +48,38 @@
     });
   </script>
 
-  <h1>Welcome, {{ username }} 👋</h1>
-  <p>Explore the world of Formula 1 with our AI-powered platform!</p>
-
   <!-- Navbar -->
   <nav class="navbar">
     <ul>
       <li><a href="#drivers">Drivers</a></li>
+      <li><a href="#teams">Teams</a></li>
       <li><a href="#quiz">Quiz</a></li>
       <li><a href="#voice-assistant">Voice Assistant</a></li>
       <li><a href="#race-prediction">Race Prediction</a></li>
       <li><a href="#f1-facts">F1 Facts</a></li>
       <li><a href="#driver-suggestion">Driver Suggestion</a></li>
-      <li><a href="#comparison">Comparison</a></li>
-      <li><a href="#race-results">Live Race Results</a></li>
       <li><a href="{{ url_for('logout') }}">Logout</a></li>
     </ul>
   </nav>
 
+  <div id="welcome-message">
+    <h1>Welcome, {{ username }} 👋</h1>
+    <p>Explore the world of Formula 1 with our AI-powered platform!</p>
+    <p class="welcome-info">
+      Dive into real-time race updates, challenge yourself with AI-generated quizzes, and discover fascinating F1 facts. Whether you're a casual fan or a racing enthusiast, our platform has something for everyone.
+    </p>
+    <p class="welcome-quote">
+      "Racing is life. Anything before or after is just waiting." – Steve McQueen
+    </p>
+    <div id="f1-fact-container" style="margin-top: 2rem;">
+      <h3>Did you know?</h3>
+      <p id="fact-text" style="font-size: 1.2rem; margin: 1rem 0;">F1 is full of surprises! 🏁</p>
+      <button id="generate-fact-btn" style="background-color: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">Generate New Fact</button>
+    </div>
+  </div>
+
   <!-- Drivers Section -->
-  <section id="drivers">
+  <section id="drivers" style="display:none;">
     <h2>Add Driver</h2>
     <form id="driver-form">
       <input type="text" id="driverID" placeholder="Driver ID" required />
@@ -92,8 +104,54 @@
     </table>
   </section>
 
+  <!-- Teams table -->
+  <section id="teams" style="display:none;">
+    <h2>Teams</h2>
+
+    <!-- Add Team Form -->
+    <form id="add-team-form">
+      <select id="driver1-select" required>
+        <option value="" disabled selected>Driver 1</option>
+      </select>
+
+      <!-- Removed Car No 1 input to avoid direct input -->
+      <!-- <label for="carno1-input">Car No 1:</label>
+      <input type="text" id="carno1-input" readonly /> -->
+
+      <select id="driver2-select" required>
+        <option value="" disabled selected>Driver 2</option>
+      </select>
+
+      <!-- Removed Car No 2 input to avoid direct input -->
+      <!-- <label for="carno2-input">Car No 2:</label>
+      <input type="text" id="carno2-input" readonly /> -->
+
+      <input type="number" id="championships-input" min="0" placeholder="No. of Championships" required />
+
+      <input type="text" id="teamname-input" placeholder="Team Name" required />
+
+      <button type="submit">Add Team</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Driver 1</th>
+          <th>Driver 2</th>
+          <th>Car No 1</th>
+          <th>Car No 2</th>
+          <th>No. of Championships</th>
+          <th>Team ID</th>
+          <th>Team Name</th>
+        </tr>
+      </thead>
+      <tbody id="teams-list"></tbody>
+    </table>
+  </section>
+  
+
   <!-- Quiz Section -->
-  <section id="quiz">
+  <section id="quiz" style="display:none;">
     <h2>Quiz Time 🏁</h2>
     <p id="quiz-question">Loading question...</p>
     <div id="quiz-options"></div>
@@ -104,23 +162,8 @@
     <button onclick="resetQuiz()">Reset Quiz</button>
   </section>
 
-  <!-- Comparison Section -->
-  <section id="comparison">
-    <h2>Compare Drivers</h2>
-    <select id="compare-entity1" aria-label="Select first driver to compare"></select>
-    <select id="compare-entity2" aria-label="Select second driver to compare"></select>
-    <button id="compare-btn">Compare</button>
-    <p id="comparison-result">Coming soon!</p>
-  </section>
-
-  <!-- Race Results Section -->
-  <section id="race-results">
-    <h2>Live Race Results</h2>
-    <p id="race-results-text">Coming soon!</p>
-  </section>
-
   <!-- Add below inside <main> before <footer> -->
-    <section id="voice-assistant">
+    <section id="voice-assistant" style="display:none;">
   <h2>🎙️ Voice Assistant</h2>
   <div id="mic-container">
     <button id="start-voice-btn" onclick="startVoiceRecognition()">🎤 Start Speaking</button>
@@ -130,7 +173,8 @@
 </section>
 
     
-<section id="race-prediction">
+    
+<section id="race-prediction" style="display:none;">
   <h2>🏎️ Predict Race Winner</h2>
   <select id="predict-driver1" aria-label="Select driver 1"></select>
   <select id="predict-driver2" aria-label="Select driver 2"></select>
@@ -139,13 +183,15 @@
   <p id="prediction-result">Awaiting prediction...</p>
 </section>
 
-<section id="f1-facts">
+    
+<section id="f1-facts" style="display:none;">
   <h2>📚 F1 AI Facts</h2>
   <button onclick="generateFact()">Get Random Fact</button>
   <p id="fact-text">F1 is full of surprises! 🏁</p>
 </section>
 
-<section id="driver-suggestion">
+    
+<section id="driver-suggestion" style="display:none;">
   <h2>🔍 Personalized Driver Suggestion</h2>
   <input type="number" id="races-input" placeholder="Enter number of races"/>
   <button onclick="suggestDriver()">Suggest Driver</button>
@@ -175,7 +221,7 @@
     <div class="footer-column">
       <h4>Contact Us</h4>
       <p>Email: javintrivedi007@gmail.com</p>
-      <p>Phone: +91 8209597013</p>
+      <p>Phone: +91 8209597013 / 8160957855</p>
       <p>Chennai, India</p>
     </div>
   </div>
