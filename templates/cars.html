@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cars - F1 AI Platform</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='footer.css') }}">
+</head>
+<body>
+  <main>
+    <script src ="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <script src ="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+    <script>
+      window.addEventListener('load', function() {
+        VANTA.FOG({
+            el: "#background",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            highlightColor: 0xf70000,
+            midtoneColor: 0xd60000,
+            lowlightColor: 0xe3ff00,
+            baseColor: 0x10100,
+            blurFactor: 0.72,
+            speed: 2.10,
+            zoom: 1.20
+          });
+      });
+    </script>
+
+    <div id="background"></div>
+
+    <nav class="navbar">
+      <ul>
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('cars') }}" class="active">Cars</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+
+    <section id="cars-list">
+      <h2>Cars</h2>
+
+      <h3>Add New Car</h3>
+      <form method="POST" action="{{ url_for('add_car') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="number" name="CarNo" placeholder="Car No" required />
+        <input type="text" name="EngineCo" placeholder="Engine Co" required />
+        <input type="text" name="chasisName" placeholder="Chasis Name" required />
+        <button type="submit">Add Car</button>
+      </form>
+
+      {% if cars %}
+      <table>
+        <thead>
+          <tr>
+            <th>Car No</th>
+            <th>Engine Co</th>
+            <th>Chasis Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for car in cars %}
+          <tr>
+            <td>{{ car.CarNo }}</td>
+            <td>{{ car.EngineCo }}</td>
+            <td>{{ car.chasisName }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No cars found.</p>
+      {% endif %}
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-column">
+        <h4>About This Platform</h4>
+        <p>This F1 AI Platform gives real-time updates, AI-generated quizzes, driver comparisons, and more.</p>
+      </div>
+      <div class="footer-column">
+        <h4>Official Links</h4>
+        <ul>
+          <li><a href="https://www.formula1.com" target="_blank">Official F1 Website</a></li>
+          <li><a href="https://www.fia.com" target="_blank">FIA</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Contact Us</h4>
+        <p>Email: javintrivedi007@gmail.com</p>
+        <p>Phone: +91 8209597013 / 8160957855</p>
+        <p>Chennai, India</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 F1 AI Platform. All Rights Reserved.
+    </div>
+  </footer>
+</body>
+</html>

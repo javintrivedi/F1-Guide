@@ -192,6 +192,114 @@ def get_teams():
         cursor.close()
         conn.close()
 
+from flask_wtf.csrf import generate_csrf
+
+@app.route('/staff')
+def staff():
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed. Please check your database settings.", "danger")
+        return redirect(url_for('home'))
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT StaffID, StaffName, Role, team_id
+            FROM staff
+            ORDER BY StaffID
+        """)
+        staff_members = cursor.fetchall()
+        csrf_token = generate_csrf()
+        return render_template('staff.html', staff=staff_members, csrf_token=csrf_token)
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Staff retrieval error: {e}")
+        flash("Failed to retrieve staff data.", "danger")
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
+        conn.close()
+
+from flask_wtf.csrf import generate_csrf
+
+@app.route('/cars')
+def cars():
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed. Please check your database settings.", "danger")
+        return redirect(url_for('home'))
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT CarNo, EngineCo, chasisName
+            FROM car
+            ORDER BY CarNo
+        """)
+        cars_list = cursor.fetchall()
+        csrf_token = generate_csrf()
+        return render_template('cars.html', cars=cars_list, csrf_token=csrf_token)
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Cars retrieval error: {e}")
+        flash("Failed to retrieve cars data.", "danger")
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
+        conn.close()
+
+from flask_wtf.csrf import generate_csrf
+
+@app.route('/sponsors')
+def sponsors():
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed. Please check your database settings.", "danger")
+        return redirect(url_for('home'))
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT SponsorID, SponsorName, team_id, Amount
+            FROM sponsors
+            ORDER BY SponsorID
+        """)
+        sponsors_list = cursor.fetchall()
+        csrf_token = generate_csrf()
+        return render_template('sponsors.html', sponsors=sponsors_list, csrf_token=csrf_token)
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Sponsors retrieval error: {e}")
+        flash("Failed to retrieve sponsors data.", "danger")
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
+        conn.close()
+
+from flask_wtf.csrf import generate_csrf
+
+@app.route('/circuit')
+def circuit():
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed. Please check your database settings.", "danger")
+        return redirect(url_for('home'))
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT CircuitID, CircuitName, No_Of_Turns, No_Of_Laps, Length_of_track
+            FROM circuit
+            ORDER BY CircuitID
+        """)
+        circuits_list = cursor.fetchall()
+        csrf_token = generate_csrf()
+        return render_template('circuit.html', circuits=circuits_list, csrf_token=csrf_token)
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Circuit retrieval error: {e}")
+        flash("Failed to retrieve circuit data.", "danger")
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
+        conn.close()
+
 import random
 
 @app.route('/add_team', methods=['POST'])
@@ -420,6 +528,130 @@ def profile():
         flash("User not found", "danger")
         return redirect(url_for('login'))
     return render_template('profile.html', user=user)
+
+from flask import flash
+
+@app.route('/add_staff', methods=['POST'])
+def add_staff():
+    StaffID = request.form.get('StaffID')
+    StaffName = request.form.get('StaffName')
+    Role = request.form.get('Role')
+    team_id = request.form.get('team_id')
+
+    if not all([StaffID, StaffName, Role, team_id]):
+        flash("All fields are required for adding staff.", "danger")
+        return redirect(url_for('staff'))
+
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed.", "danger")
+        return redirect(url_for('staff'))
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO staff (StaffID, StaffName, Role, team_id) VALUES (%s, %s, %s, %s)",
+                       (StaffID, StaffName, Role, team_id))
+        conn.commit()
+        flash("Staff member added successfully.", "success")
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Insert staff error: {e}")
+        flash("Failed to add staff member. Possibly duplicate StaffID.", "danger")
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for('staff'))
+
+@app.route('/add_car', methods=['POST'])
+def add_car():
+    CarNo = request.form.get('CarNo')
+    EngineCo = request.form.get('EngineCo')
+    chasisName = request.form.get('chasisName')
+
+    if not all([CarNo, EngineCo, chasisName]):
+        flash("All fields are required for adding car.", "danger")
+        return redirect(url_for('cars'))
+
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed.", "danger")
+        return redirect(url_for('cars'))
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO car (CarNo, EngineCo, chasisName) VALUES (%s, %s, %s)",
+                       (CarNo, EngineCo, chasisName))
+        conn.commit()
+        flash("Car added successfully.", "success")
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Insert car error: {e}")
+        flash("Failed to add car. Possibly duplicate CarNo.", "danger")
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for('cars'))
+
+@app.route('/add_sponsor', methods=['POST'])
+def add_sponsor():
+    SponsorID = request.form.get('SponsorID')
+    SponsorName = request.form.get('SponsorName')
+    team_id = request.form.get('team_id')
+    Amount = request.form.get('Amount')
+
+    if not all([SponsorID, SponsorName, team_id, Amount]):
+        flash("All fields are required for adding sponsor.", "danger")
+        return redirect(url_for('sponsors'))
+
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed.", "danger")
+        return redirect(url_for('sponsors'))
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO sponsors (SponsorID, SponsorName, team_id, Amount) VALUES (%s, %s, %s, %s)",
+                       (SponsorID, SponsorName, team_id, Amount))
+        conn.commit()
+        flash("Sponsor added successfully.", "success")
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Insert sponsor error: {e}")
+        flash("Failed to add sponsor. Possibly duplicate SponsorID.", "danger")
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for('sponsors'))
+
+@app.route('/add_circuit', methods=['POST'])
+def add_circuit():
+    CircuitID = request.form.get('CircuitID')
+    CircuitName = request.form.get('CircuitName')
+    No_Of_Turns = request.form.get('No_Of_Turns')
+    No_Of_Laps = request.form.get('No_Of_Laps')
+    Length_of_track = request.form.get('Length_of_track')
+
+    if not all([CircuitID, CircuitName, No_Of_Turns, No_Of_Laps, Length_of_track]):
+        flash("All fields are required for adding circuit.", "danger")
+        return redirect(url_for('circuit'))
+
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed.", "danger")
+        return redirect(url_for('circuit'))
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO circuit (CircuitID, CircuitName, No_Of_Turns, No_Of_Laps, Length_of_track)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (CircuitID, CircuitName, No_Of_Turns, No_Of_Laps, Length_of_track))
+        conn.commit()
+        flash("Circuit added successfully.", "success")
+    except mysql.connector.Error as e:
+        app.logger.error(f"❌ Insert circuit error: {e}")
+        flash("Failed to add circuit. Possibly duplicate CircuitID.", "danger")
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for('circuit'))
 
 if __name__ == '__main__':
     app.run(debug=False, port=5000)
