@@ -70,7 +70,7 @@
   <h2>🧑‍💻 Installation</h2>
   <ol>
     <li><strong>Clone the repo</strong><br>
-      <pre><code>git clone https://github.com/yourusername/f1-guide.git
+      <pre><code>git clone https://github.com/javintrivedi/f1-guide.git
 cd f1-guide</code></pre>
     </li>
     <li><strong>Create a virtual environment</strong><br>
