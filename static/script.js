@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainSections = document.querySelectorAll("section:not(#login-signup)");
   const navLinks = document.querySelectorAll("nav ul li a");
 
-  // Initialize quiz score variables
   let currentScore = 0;
   let totalQuestions = 0;
 
