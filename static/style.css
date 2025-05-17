@@ -1,6 +1,3 @@
-/* Base Reset (You can include your own reset or use normalize.css) */
-
-/* Custom Styles */
 html {
     scroll-behavior: smooth;
     font-size: 16px;
@@ -64,7 +61,6 @@ body {
   background-color: #1f2937;
 }
 
-/* Align driver dropdowns and related inputs in Add Team form in a single row */
 #add-team-form {
   display: flex;
   flex-wrap: wrap;
